@@ -1043,7 +1043,7 @@ class maze:
         rows = 0
         cols = 0
         directory = 'results'
-        csv_file = 'Results.csv'
+        csv_file = 'Results_New.csv'
 
         # Create the 'results' directory if it doesn't exist
         if not os.path.exists(directory):
@@ -1064,7 +1064,7 @@ class maze:
                 cols = cols + 10
                 self.rows = rows
                 self.cols = cols
-                for j in range(1, 6000):
+                for j in range(1, 50):
                     global _killed
                     _killed = 1
                     self.maze_map={}
