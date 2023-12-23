@@ -8,11 +8,21 @@
 | Mohamed Abdo Allam  | 800159903  | High Contribtutions         |
 | Mohamed Awadin   | 800160074  | High Contribtutions   |
 | Mohamed Fahmy   | 800168127  | High Contribtutions   |
-| Mohamed Zahran   | 800168127  | High Contribtutions   |
+| Mohamed Zahran   | 800161918  | High Contribtutions   |
+| Abd El Rahman Ehab   | 800161763  | High Contribtutions   |
+| Mohamed Alkoka   | 800167244  | High Contribtutions   |
+| Mahmoud Labib   | 803084761  | High Contribtutions   |
+| Hany ElEsawy   | 800167243     | High Contribtutions   |
 
 
 ### Overview
 This project aims to create maps randomly and implement various search algorithms on them.
+<p align="center">
+  <img  src="results/Optimal_Path.gif" width="1000">
+</p>
+
+## Run the project
+### See more about how to run the project here : [Running the Project](docs/Run_Project.md)
 
 ## Project Description
 The main idea for this project is to build a  module that is able to apply the various search algorithms that we studied throughout this course to a randomly generated map and showcase which algorithm reached the goal first.
@@ -40,18 +50,42 @@ This data could also be used in designing new roads to reduce the distance betwe
 - [DFS](docs/DFS.md)
 - [BFS](docs/BFS.md)
 
+## GUI
+### See more about GUI here : [GUI](docs/GUI.md)
 ## Results
+### See all Reults here : [Results](docs/Maze_results.md)
 1. **Maze Generation:**
    The module begins by generating a random maze.
 
-   ![Random Maze](path/to/your/maze_image.png)
+   ![Random Maze](results/Maze.png)
 
-2. **Algorithm Execution:**
-   Users can choose an algorithm to solve the maze. The GUI visually displays the algorithm's solution, showcasing its randomness and cost.
+2. **Optimal Solution:**
+   Users can choose any algorithm to solve the maze, but let's start with optimal solution.
 
-   ![Algorithm Solution](path/to/your/algorithm_solution_image.png)
+   ![Optimal Solution](results/Optimal_Path.gif)
 
-3. **Performance Evaluation:**
+3. **A Star:**
+   Now let's see How the A* is going to solve the Maze.
+
+   ![A Start](results/A_Star.gif)
+
+4. **Dijkstra:**
+   When it comes to Dijkstra algorithm it is going to take a while but it will solve the Maze.
+
+   ![Dijkstra](results/Dijkstra.gif)
+
+5. **DFS:**
+   Sometimes it is better to start without too much thinking
+
+   ![DFS](results/DFS.gif)
+
+6. **BFS:**
+   It seems to be similar to dijkstra but it is not.
+
+   ![BFS](results/BFS.gif)
+
+
+6. **Performance Evaluation:**
    The module performs multiple iterations, solving each maze with all algorithms. The results, including the number of steps taken by each algorithm, are then presented in a chart.
 
    ![Algorithm Performance Chart](path/to/your/performance_chart_image.png)
@@ -60,3 +94,20 @@ This data could also be used in designing new roads to reduce the distance betwe
 Here's an example of the module solving a single random maze using the chosen algorithm. 
 
 ![Single Maze Solution](results/01.png)
+
+### Our Statics
+### See more about Statics here : [Statics](docs/Statics.md)
+
+<img src="results/Statics_Optimal_Steps.png" alt="Image 1">
+
+<img src="results/Statics_Astar_Steps.png" alt="Image 2" style="width: 45%; float: left; margin-right: 2%;">
+<img src="results/Statics_Astar_Accuracy.png" alt="Image 3" style="width: 45%; float: left;">
+
+<img src="results/Statics_Dijkstra_Steps.png" alt="Image 4" style="width: 45%; float: left; margin-right: 2%;">
+<img src="results/Statics_Dijkstra_Accuracy.png" alt="Image 5" style="width: 45%; float: left;">
+
+<img src="results/Statics_DFS_Steps.png" alt="Image 6" style="width: 45%; float: left; margin-right: 2%;">
+<img src="results/Statics_DFS_Accuracy.png" alt="Image 7" style="width: 45%; float: left;">
+
+<img src="results/Statics_BFS_Steps.png" alt="Image 8" style="width: 45%; float: left; margin-right: 2%;">
+<img src="results/Statics_BFS_Accuracy.png" alt="Image 9" style="width: 45%; float: left;">

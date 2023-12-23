@@ -7,6 +7,9 @@ import os
 # Add the path to the Algorithms directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '../Algorithms'))
 from dijkstra import dijkstra
+from a_star import aStar_with_costs
+from BFS import BFS_with_costs
+from DFS import DFS_with_costs
 import random,datetime,csv,os
 import customtkinter as ctk
 from tkinter import *
@@ -18,6 +21,7 @@ Cell_Width = 50
 _killed = 0
 mRow, mCol = None, None
 After_id = None
+costWalk = 0
 Delay = 100
 background_image, card1, card2 = None, None, None
 costLIST = None
@@ -129,11 +133,14 @@ class agent:
                     if self.filled:
                         lll=self._parentMaze._canvas.coords(self._head)
                         oldcell=(round(((lll[1]-26)/self._parentMaze._cell_width)+1),round(((lll[0]-26)/self._parentMaze._cell_width)+1))
-                        if(costLIST == None):
-                            self._parentMaze._redrawCell(*oldcell,self._parentMaze.theme)
-                        else:    
-                            # print(costLIST[oldcell])
+                        try:
                             self._parentMaze._redrawCell(*oldcell,self._parentMaze.theme, costT = (costLIST[oldcell][2]), cost1 = (costLIST[oldcell][0]), cost2=(costLIST[oldcell][1]))
+                        except:
+                            pass
+                        # if(costLIST == None):
+                        #     self._parentMaze._redrawCell(*oldcell,self._parentMaze.theme)
+                        # else:    
+                            # print(costLIST[oldcell])
                         # self._parentMaze._canvas.create_text(y + w / 2, x + w / 2 - 15, text=f"{int(costLIST[oldcell][2])}", fill="#D31122", font=("Arial", 20, "bold"))
                 else:
                     self._parentMaze._canvas.itemconfig(self._head, fill=self.color.value[1])#,outline='gray70')
@@ -173,7 +180,10 @@ class agent:
                     self._parentMaze._canvas.tag_lower(self._head,'ov')
                 except:
                         pass
-                self._parentMaze._redrawCell(self.x,self.y,theme=self._parentMaze.theme)
+                try:
+                    self._parentMaze._redrawCell(*oldcell,self._parentMaze.theme, costT = (costLIST[oldcell][2]), cost1 = (costLIST[oldcell][0]), cost2=(costLIST[oldcell][1]))
+                except:
+                    pass
         else:
             self._head=self._parentMaze._canvas.create_rectangle(*self._coord,fill=self.color.value[0],outline='')#stipple='gray75'
             try:
@@ -367,11 +377,11 @@ class maze:
             background_image = ImageTk.PhotoImage(Image.open("src/Assets/Background.jpg"))
         if card1 == None:
             card1 = Image.open("src/Assets/Card_1.png")
-            card1 = card1.resize((int(0.65 * W), int(0.09 * H)), resample=Image.ANTIALIAS)
+            card1 = card1.resize((int(0.65 * W), int(0.09 * H)), resample=Image.LANCZOS)
             card1 = ImageTk.PhotoImage(card1)
         if card2 == None:
             card2 = Image.open("src/Assets/Card_2.png")
-            card2 = card2.resize((int(0.207 * W), int(0.06 * H)), resample=Image.ANTIALIAS)
+            card2 = card2.resize((int(0.207 * W), int(0.06 * H)), resample=Image.LANCZOS)
             card2 = ImageTk.PhotoImage(card2)
         self._canvas.create_image(0, 0, anchor='nw', image=background_image)
         self._canvas.pack(expand=YES, fill=BOTH)
@@ -411,8 +421,9 @@ class maze:
             try:
                 rows = int(rows_content)
                 columns = int(columns_content)
-                if(self.rows != rows or self.cols != columns):
-                    self._nextMap(rows, columns)
+                if((rows * columns < 500*500)):
+                    if(self.rows != rows or self.cols != columns):
+                        self._nextMap(rows, columns)
             except ValueError:
                 print("Invalid input. Please enter valid numbers for rows and columns.")
         global Delay
@@ -450,7 +461,7 @@ class maze:
         columns_text.bind("<KeyRelease>", lambda event: on_text_change(event) )
         Delay_text.bind("<KeyRelease>", lambda event: on_Delay_change(event) )
         pass
-    def CreateMaze(self,x=1,y=1,pattern=None,loopPercent=0,saveMaze=False,loadMaze=None,theme:COLOR=COLOR.dark):
+    def CreateMaze(self,x=1,y=1,pattern=None,loopPercent=0,saveMaze=False,loadMaze=None,theme:COLOR=COLOR.dark, gui_maze = True):
         '''
         One very important function to create a Random Maze
         pattern-->  It can be 'v' for vertical or 'h' for horizontal
@@ -701,9 +712,10 @@ class maze:
                     c[0]=int(c[0].lstrip('('))
                     c[1]=int(c[1].rstrip(')'))
                     self.maze_map[tuple(c)]={'E':int(i[1]),'W':int(i[2]),'N':int(i[3]),'S':int(i[4])}
+        if (gui_maze):
             self.path=BFS((self.rows,self.cols))
-        self._drawMaze(self.theme)
-        agent(self,*self._goal,shape='square',filled=True,color=COLOR.green)
+            self._drawMaze(self.theme)
+            agent(self,*self._goal,shape='square',filled=True,color=COLOR.green)
         if saveMaze:
             dt_string = datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")
             with open(f'maze--{dt_string}.csv','w',newline='') as f:
@@ -744,23 +756,129 @@ class maze:
         ########################################################################################################
         ############################################ PRINT STRINGS #############################################
         ########################################################################################################
+        base_font_size = 19
+        font_size_factor = W / 1920
 
+        scaled_font_size = int(min(base_font_size * font_size_factor, 10000))
+    #Youssef Elshabrawii - 800161991#
         self._canvas.create_text(
-          0.564 * W,
-          0.54 * H,
+          0.568 * W,
+          0.532 * H,
           anchor="nw",
-          text=" Youssef Elshabrawii - 800161991       Mohamed Sarary    - 800161979    \n\n\n Mohamed Awadin    - 800160074       Mohamed Fahmy    - 800168127 \n\n\n Hany Elesawy          - 800167243       Mahmoud Labib      - 803084761 \n\n\n Mohamed Alkoka     - 800167244       Abdelrahman Ehab - 800161763 \n\n\n Mohamed Zahran    - 800161918       Mohamed Allam      - 800159903 ",
+          text=" Youssef Elshabrawii - 800161991",
           fill="#FFFFFF",
-        font=("Itim Regular", 20 * -1, "bold")
+        font=("Itim Regular", scaled_font_size * -1, "bold")
         )   
 
+    #Mohamed Sarary - 800161979#
+        self._canvas.create_text(
+          0.790 * W,
+          0.532 * H,
+          anchor="nw",
+          text=" Mohamed Sarary - 800161979",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+    #Mohamed Awadin - 800160074# 
+        self._canvas.create_text(
+          0.790 * W,
+          0.6 * H,
+          anchor="nw",
+          text=" Mohamed Awadin - 800160074",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+    #Mohamed Fahmy    - 800168127#
+        self._canvas.create_text(
+          0.790 * W,
+          0.667 * H,
+          anchor="nw",
+          text=" Mohamed Fahmy - 800168127",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+    #Hany Elesawy - 800167243#
+        self._canvas.create_text(
+          0.798 * W,
+          0.735 * H,
+          anchor="nw",
+          text=" Hany Elesawy - 800167243",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        )
+
+    #Mahmoud Labib - 803084761#   
+        self._canvas.create_text(
+          0.794 * W,
+          0.80 * H,
+          anchor="nw",
+          text=" Mahmoud Labib - 803084761",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        )
+
+    #Mohamed Alkoka - 800167244#
+        self._canvas.create_text(
+         0.570 * W,
+          0.6 * H,
+          anchor="nw",
+          text=" Mohamed Alkoka - 800167244",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        )     
+
+    #Abdelrahman Ehab - 800161763#
+        self._canvas.create_text(
+          0.562 * W,
+          0.667*H,
+          anchor="nw",
+          text=" Abdelrahman Ehab - 800161763",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+    #Mohamed Zahran - 800161918#
+        self._canvas.create_text(
+          0.568 * W,
+          0.735 * H,
+          anchor="nw",
+          text=" Mohamed Zahran - 800161918",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+    #Mohamed Allam - 800159903#
+        self._canvas.create_text(
+          0.568 * W,
+          0.80 * H,
+          anchor="nw",
+          text=" Mohamed Allam - 800159903",
+          fill="#FFFFFF",
+        font=("Itim Regular", scaled_font_size * -1, "bold")
+        ) 
+
+        # self._canvas.create_text(
+        #   0.564 * W,
+        #   0.54 * H,
+        #   anchor="nw",
+        #   text=" Youssef Elshabrawii - 800161991       Mohamed Sarary    - 800161979    \n\n\n Mohamed Awadin    - 800160074       Mohamed Fahmy    - 800168127 \n\n\n Hany Elesawy          - 800167243       Mahmoud Labib      - 803084761 \n\n\n Mohamed Alkoka     - 800167244       Abdelrahman Ehab - 800161763 \n\n\n Mohamed Zahran    - 800161918       Mohamed Allam      - 800159903 ",
+        #   fill="#FFFFFF",
+        # font=("Itim Regular", 20 * -1, "bold")
+        # )   
+        base_font_size = 35
+        font_size_factor = W / 1920
+
+        scaled_font_size = int(min(base_font_size * font_size_factor, 10000))
         self._canvas.create_text(
           0.029 * W,
           0.870 * H,
           anchor="nw",
           text=" Powered by :  Assoc. Prof.: Amira Yassin - Eng : Fatma Gamal  ",
           fill="#FFFFFF",
-        font=("Itim Regular", 35 * -1)
+        font=("Itim Regular", scaled_font_size * -1)
         ) 
         # Some calculations for calculating the width of the maze cell
         k=3.25
@@ -796,8 +914,6 @@ class maze:
                     if self.maze_map[cell]['S']==False:
                         l=self._canvas.create_line(y, x + w, y + w, x + w,width=2,fill=theme.value[1],tag='line')
         self._drawButtons()
-    def _print(self):
-        print("Hi Yasta")
     def _nextMap(self, rows = None, cols = None):
         if(rows == None):
             rows = self.rows
@@ -826,7 +942,8 @@ class maze:
     ############################################ BUTTONS #################################################
     ######################################################################################################
     def _killAgent(self, __Agent = None):
-        global After_id, Agent
+        global After_id, Agent, costWalk
+        costWalk = 0
         if(__Agent == None):
             __Agent = Agent
         if After_id is not None:
@@ -847,27 +964,137 @@ class maze:
         #     if len(maze._tracePathList)>0:
         #         self.tracePath(maze._tracePathList[0][0],kill=maze._tracePathList[0][1],delay=maze._tracePathList[0][2])
         _killed = 0
+    def _showCost(self, costWalk):
+        W = self._win.winfo_screenwidth()
+        H = self._win.winfo_screenheight()
+        if W > 2000:
+            W = 1920
+        if H > 1200:
+            H = 1080
+        ids.append(self._canvas.create_text(0.8 * W, 0.48 * H, text=str("Cost = "+ str(costWalk)), fill="#FFFFFF", font=("Arial", 30, "bold")))
     def _Astar(self):
-        global killed, Agent
+        
+        global killed, Agent, Delay, costLIST, costWalk
         killed = 1
         self._killAgent(Agent)
-    def _Dijkstra(self):
-        global killed, Agent, Delay, costLIST
-        killed = 1
-        self._killAgent(Agent)
-        path, Costs, Total_Cost = dijkstra(self)
+        path, Costs, Total_Cost = aStar_with_costs(self)
+        self._showCost(len(path))
+        
         # print(path)
         costLIST = Costs
         Agent = agent(self,filled=True,footprints=True, shape="square")
         self.tracePath({Agent: path}, delay=Delay, kill=False, listCost = Costs)
-    def _Optimal(self):
-        global killed, Agent, Delay, costLIST
-        costLIST = None
+    def _Dijkstra(self):
+        global killed, Agent, Delay, costLIST, costWalk
         killed = 1
         self._killAgent(Agent)
+        path, Costs, Total_Cost = dijkstra(self)
+        self._showCost(len(path) + 1)
+        # print(path)
+        costLIST = Costs
+        Agent = agent(self,filled=True,footprints=True, shape="square")
+        self.tracePath({Agent: path}, delay=Delay, kill=False, listCost = Costs)
+    def _BFS(self):
+        global killed, Agent, Delay, costLIST, costWalk
+        killed = 1
+        self._killAgent(Agent)
+        path, Costs, Total_Cost = BFS_with_costs(self)
+        self._showCost(len(path))
+        costLIST = Costs
+        Agent = agent(self,filled=True,footprints=True, shape="square")
+        self.tracePath({Agent: path}, delay=Delay, kill=False, listCost = Costs)
+    def _DFS(self):
+        global killed, Agent, Delay, costLIST, costWalk
+        killed = 1
+        self._killAgent(Agent)
+        path, Costs, Total_Cost = DFS_with_costs(self)
+        self._showCost(len(path))
+        costLIST = Costs
+        Agent = agent(self,filled=True,footprints=True, shape="square")
+        self.tracePath({Agent: path}, delay=Delay, kill=False, listCost = Costs)
+    def _Optimal(self):
+        global killed, Agent, Delay, costLIST, costWalk
+        costLIST = None
+        killed = 1
+        
+        self._killAgent(Agent)
+        self._showCost(len(self.path) + 1)
         Agent=agent(self,filled=True,footprints=True, shape="square")
         self.tracePath({Agent:self.path}, delay=Delay, kill=False)
-        
+    def _getStatics(self):
+        def show_alert(message):
+            W = self._win.winfo_screenwidth()
+            H = self._win.winfo_screenheight()
+            if W > 2000:
+                W = 1920
+            if H > 1200:
+                H = 1080
+            alert_window = Toplevel(self._win)
+            alert_window.title("Alert")
+
+            # Display the message
+            label = Label(alert_window, text=message, padx=10, pady=10)
+            label.pack()
+            alert_window.geometry(f"+{W // 2}+{H // 2}")
+
+            # Close the alert window after 2000 milliseconds (2 seconds)
+            alert_window.after(2000, alert_window.destroy)
+        # show_alert("I will start preparing result...")
+        rows = 0
+        cols = 0
+        directory = 'results'
+        csv_file = 'Results.csv'
+
+        # Create the 'results' directory if it doesn't exist
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Construct the full file path
+        file_path = os.path.join(directory, csv_file)
+
+        # Write data to CSV
+        with open(file_path, 'w', newline='') as file:
+            
+            result = "ID, Maze Size, Optimal, A Star, Accuracy, Dijkstra, Accuracy, DFS, Accuracy, BFS, Accuracy \n"
+            file.write(result)
+            ID = 0
+            for i in range(1, 6):
+                ID = ID + 1
+                rows = rows + 10
+                cols = cols + 10
+                self.rows = rows
+                self.cols = cols
+                for j in range(1, 6000):
+                    global _killed
+                    _killed = 1
+                    self.maze_map={}
+                    self.grid=[]
+                    self.path={} 
+                    self._cell_width=50  
+                    self._agents=[]
+                    self.markCells=[]
+                    self._tracePathList.clear()
+                    self.CreateMaze(loopPercent=50, theme=COLOR.dark, gui_maze=False)
+                    DFSpath, Costs, Total_Cost = DFS_with_costs(self)
+                    BFSpath, Costs, Total_Cost = BFS_with_costs(self)
+                    Dijkstrapath, Costs, Total_Cost = dijkstra(self)
+                    aStarpath, Costs, Total_Cost = aStar_with_costs(self)
+                    def calculateAcuuracy(Observed, Actual):
+                        _Error = abs(Observed - Actual) / Actual
+                        _Accuracy = 1 - _Error
+                        return _Accuracy
+                    DFSaccuracy = calculateAcuuracy(len(self.path), len(DFSpath))
+                    BFSaccuracy = calculateAcuuracy(len(self.path), len(BFSpath))
+                    Dijkstraaccuracy = calculateAcuuracy(len(self.path), len(Dijkstrapath))
+                    aStaraccuracy = calculateAcuuracy(len(self.path), len(aStarpath))
+                    result =  str(ID) + "," + str(self.rows) + "x" + str(self.cols) + "," + str(len(self.path)) + ","
+                    result += str(len(aStarpath)) + "," + str(round(aStaraccuracy, 2)) + ","
+                    result += str(len(Dijkstrapath)) + "," + str(round(Dijkstraaccuracy, 2)) + ","
+                    result += str(len(DFSpath)) + "," + str(round(DFSaccuracy, 2)) + ","
+                    result += str(len(BFSpath)) + "," + str(round(BFSaccuracy, 2)) + "\n"
+                    file.write(result)
+        show_alert("I created \'Results.csv\' in \'results\' directory")
+        return
     def _drawButtons(self):
         W = self._win.winfo_screenwidth()
         H = self._win.winfo_screenheight()
@@ -883,9 +1110,9 @@ class maze:
         BTTN2.place(x=0.65 * W, y=0.25 * H)
         
 
-        BTTN3 = ctk.CTkButton(self._canvas, text="3- DFS ", command=self._nextMap, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
+        BTTN3 = ctk.CTkButton(self._canvas, text="3- DFS ", command=self._DFS, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
         BTTN3.place(x=0.65 * W, y=0.325 * H)
-        BTTN7 = ctk.CTkButton(self._canvas, text="4- BFS     ", command=self._nextMap, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
+        BTTN7 = ctk.CTkButton(self._canvas, text="4- BFS     ", command=self._BFS, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
         BTTN7.place(x=0.75 * W, y=0.325 * H)
         BTTN8 = ctk.CTkButton(self._canvas, text="Optimal Solution", command=self._Optimal, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
         BTTN8.place(x=0.87 * W, y=0.25 * H)
@@ -894,7 +1121,7 @@ class maze:
         BTTN4.place(x=0.75 * W, y=0.25 * H)
         
 
-        BTTN5 = ctk.CTkButton(self._canvas, text="           Get Statics           ", command=self._nextMap, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
+        BTTN5 = ctk.CTkButton(self._canvas, text="           Get Statics           ", command=self._getStatics, font=ctk.CTkFont(family='arial', size=30), fg_color="#0077B6", text_color="WHITE", hover_color="#00b4d8", border_color="WHITE", bg_color="black")
         BTTN5.place(x=0.65 * W, y=0.4 * H)
                 
 
@@ -907,8 +1134,12 @@ class maze:
 
     def _close_gui(self):
         self._win.destroy()   
-
+    
     def _redrawCell(self,x,y,theme,cost1 = "",cost2 = "",costT = ""):
+        base_font_size = 19
+        font_size_factor = 10 / max(self.cols, self.rows)
+
+        scaled_font_size = min(base_font_size * font_size_factor, 10000) + 3
         # print(x, y, costT)
         '''
         To redraw a cell.
@@ -927,12 +1158,13 @@ class maze:
             self._canvas.create_line(y, x, y + w, x,width=2,fill=theme.value[1])
         if self.maze_map[cell]['S']==False:
             self._canvas.create_line(y, x + w, y + w, x + w,width=2,fill=theme.value[1])
-        if(costT):
-            ids.append(self._canvas.create_text(y + w / 2, x + w / 2 - 15, text=f"{costT}", fill="#D31122", font=("Arial", 20, "bold")))
-        if(cost1):
-            ids.append(self._canvas.create_text(y + w / 2 - 25, x + w - 18, text=f"{cost1}", fill="#4470AD", font=("Arial", 16, "bold")))
-        if(cost2):
-            ids.append(self._canvas.create_text(y + w / 2 + 25, x + w - 18, text=f"{cost2}", fill="#11A797", font=("Arial", 16, "bold")))
+        if(costT != None):
+            
+            ids.append(self._canvas.create_text(y + w / 2, x + w / 2 - 15 * font_size_factor, text=f"{costT}", fill="#D31122", font=("Arial", int(scaled_font_size), "bold")))
+        if(cost1 != None):
+            ids.append(self._canvas.create_text(y + w / 2 - 25 * font_size_factor, x + w - 18 * font_size_factor, text=f"{cost1}", fill="#4470AD", font=("Arial", int(scaled_font_size - 2), "bold")))
+        if(cost2 != None):
+            ids.append(self._canvas.create_text(y + w / 2 + 25 * font_size_factor, x + w - 18 * font_size_factor, text=f"{cost2}", fill="#11A797", font=("Arial", int(scaled_font_size - 2), "bold")))
         # print("finished")
     def enableArrowKey(self,a):
         '''
@@ -956,6 +1188,12 @@ class maze:
 
     _tracePathList=[]
     def _tracePathSingle(self,a,p,kill,showMarked,delay, listCosts = None):
+        W = self._win.winfo_screenwidth()
+        H = self._win.winfo_screenheight()
+        if W > 2000:
+            W = 1920
+        if H > 1200:
+            H = 1080 
         while waitT == 1:
             a.y = a.y
             print("waiting")
@@ -964,7 +1202,7 @@ class maze:
         # return
         # print(a.x, a.y)
         # print(f"S {a.x} and {a.y}")
-        global _killed, mRow, mCol
+        global _killed, mRow, mCol, costWalk
         _continu = ( a.x == mRow and a.y == mCol)
         '''
         An interal method to help tracePath method for tracing a path by agent.
@@ -987,12 +1225,15 @@ class maze:
             y=a.y*w-w+self._LabWidth
             self._canvas.create_oval(y + w/2.5+w/20, x + w/2.5+w/20,y + w/2.5 +w/4-w/20, x + w/2.5 +w/4-w/20,fill='#FFF100',outline='FFF100',tag='ov')
             self._canvas.tag_raise('ov')
-            print("Hi")
+            # print("Hi")
             self._redrawCell(x, y, self.theme, costT=listCosts[(a.x, a.y)][2])
        
         if (a.x,a.y)==(a.goal):
-            print("hi")
-            self._redrawCell(a.x, a.y, self.theme, cost1=costLIST[(a.x, a.y)][0], cost2=costLIST[(a.x, a.y)][1], costT=costLIST[(a.x, a.y)][2])
+            
+            try:
+                self._redrawCell(a.x, a.y, self.theme, cost1=costLIST[(a.x, a.y)][0], cost2=costLIST[(a.x, a.y)][1], costT=costLIST[(a.x, a.y)][2])
+            except:
+                pass
             # del maze._tracePathList[0][0][a]
             # if maze._tracePathList[0][0]=={}:
             #     del maze._tracePathList[0]
@@ -1113,7 +1354,7 @@ class maze:
                         self.tracePath(maze._tracePathList[0][0],kill=maze._tracePathList[0][1],delay=maze._tracePathList[0][2])
                 if kill:                    
                     self._win.after(300, killAgent,a)  
-                print("will return")
+                # print("will return")
                 return
             if a.shape=='arrow':
                 old=(a.x,a.y)
@@ -1163,6 +1404,7 @@ class maze:
         A method to trace path by agent
         You can provide more than one agent/path details
         '''
+        
         self._tracePathList.clear()
         self._tracePathList.append((d,kill,delay))
         if maze._tracePathList[0][0]==d: 
