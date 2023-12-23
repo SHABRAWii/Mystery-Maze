@@ -85,10 +85,7 @@ This data could also be used in designing new roads to reduce the distance betwe
    ![BFS](results/BFS.gif)
 
 
-6. **Performance Evaluation:**
-   The module performs multiple iterations, solving each maze with all algorithms. The results, including the number of steps taken by each algorithm, are then presented in a chart.
 
-   ![Algorithm Performance Chart](path/to/your/performance_chart_image.png)
 ### Single Maze Solution
 
 Here's an example of the module solving a single random maze using the chosen algorithm. 
@@ -100,14 +97,14 @@ Here's an example of the module solving a single random maze using the chosen al
 
 <img src="results/Statics_Optimal_Steps.png" alt="Image 1">
 
-<img src="results/Statics_Astar_Steps.png" alt="Image 2" style="width: 45%; float: left; margin-right: 2%;">
-<img src="results/Statics_Astar_Accuracy.png" alt="Image 3" style="width: 45%; float: left;">
+<img src="results/Statics_Astar_Steps.png" alt="Image 2" >
+<img src="results/Statics_Astar_Accuracy.png" alt="Image 3" >
 
-<img src="results/Statics_Dijkstra_Steps.png" alt="Image 4" style="width: 45%; float: left; margin-right: 2%;">
-<img src="results/Statics_Dijkstra_Accuracy.png" alt="Image 5" style="width: 45%; float: left;">
+<img src="results/Statics_Dijkstra_Steps.png" alt="Image 4" >
+<img src="results/Statics_Dijkstra_Accuracy.png" alt="Image 5" >
 
-<img src="results/Statics_DFS_Steps.png" alt="Image 6" style="width: 45%; float: left; margin-right: 2%;">
-<img src="results/Statics_DFS_Accuracy.png" alt="Image 7" style="width: 45%; float: left;">
+<img src="results/Statics_DFS_Steps.png" alt="Image 6" >
+<img src="results/Statics_DFS_Accuracy.png" alt="Image 7" >
 
-<img src="results/Statics_BFS_Steps.png" alt="Image 8" style="width: 45%; float: left; margin-right: 2%;">
-<img src="results/Statics_BFS_Accuracy.png" alt="Image 9" style="width: 45%; float: left;">
+<img src="results/Statics_BFS_Steps.png" alt="Image 8" >
+<img src="results/Statics_BFS_Accuracy.png" alt="Image 9" >
