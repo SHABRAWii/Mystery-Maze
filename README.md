@@ -25,7 +25,7 @@ This project aims to create maps randomly and implement various search algorithm
 ### See more about how to run the project here : [Running the Project](docs/Run_Project.md)
 
 ## Project Description
-The main idea for this project is to build a  module that is able to apply the various search algorithms that we studied throughout this course to a randomly generated map and showcase which algorithm reached the goal first.
+The main idea for this project is to build a  module that can apply the various search algorithms that we studied throughout this course to a randomly generated map and showcase which algorithm reached the goal first.
 
 This idea has already been implemented in other projects that served as our inspiration. Nevertheless, we aspire to construct this module from scratch on our own.
 
